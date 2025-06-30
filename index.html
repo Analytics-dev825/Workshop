@@ -21,7 +21,16 @@
 
     <script type="text/babel">
         const { useState, useEffect } = React;
-        const { Search, MessageSquare, BarChart3, Users, TrendingUp, AlertCircle, Mic, MicOff } = lucide;
+        
+        // Create icon components from Lucide
+        const Search = (props) => React.createElement(lucide.Search, props);
+        const MessageSquare = (props) => React.createElement(lucide.MessageSquare, props);
+        const BarChart3 = (props) => React.createElement(lucide.BarChart3, props);
+        const Users = (props) => React.createElement(lucide.Users, props);
+        const TrendingUp = (props) => React.createElement(lucide.TrendingUp, props);
+        const AlertCircle = (props) => React.createElement(lucide.AlertCircle, props);
+        const Mic = (props) => React.createElement(lucide.Mic, props);
+        const MicOff = (props) => React.createElement(lucide.MicOff, props);
 
         const PLICSAIDemo = () => {
             const [activeTab, setActiveTab] = useState('query');
@@ -301,7 +310,7 @@ Just let me know what you'd like to explore further!`;
                                                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                                                 }`}
                                             >
-                                                {isListening ? React.createElement(MicOff, {className: "w-4 h-4"}) : React.createElement(Mic, {className: "w-4 h-4"})}
+                                                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                                             </button>
                                             <button
                                                 onClick={() => handleQuerySubmit()}
