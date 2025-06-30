@@ -1,103 +1,198 @@
-import React, { useState, useEffect } from 'react';
-import { Search, MessageSquare, BarChart3, Users, TrendingUp, AlertCircle, Mic, MicOff } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Enhanced PLICS Engine</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Additional custom styles if needed */
+        .chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .listening-pulse {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-const PLICSAIDemo = () => {
-  const [activeTab, setActiveTab] = useState('query');
-  const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [isListening, setIsListening] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
-  const [insights, setInsights] = useState([]);
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  // Sample data for demonstrations
-  const sampleInsights = [
-    {
-      id: 1,
-      type: 'alert',
-      title: 'Theatre Costs Alert',
-      message: 'Orthopaedic theatre costs increased 15% this month - mainly due to longer procedure times and increased implant costs.',
-      action: 'View Details',
-      priority: 'high'
-    },
-    {
-      id: 2,
-      type: 'opportunity',
-      title: 'Cost Improvement Opportunity',
-      message: 'A&E cost per attendance is 8% below national average - potential to share best practices with other departments.',
-      action: 'Generate Report',
-      priority: 'medium'
-    },
-    {
-      id: 3,
-      type: 'trend',
-      title: 'Positive Trend Detected',
-      message: 'Day case conversion rate improved by 12% in general surgery, reducing average length of stay costs.',
-      action: 'View Analysis',
-      priority: 'low'
-    }
-  ];
+        // Lucide icons as SVG components
+        const Search = () => (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+        );
 
-  const querySuggestions = [
-    "What's the average cost of hip replacements this quarter?",
-    "Show me all patients who cost more than £15,000 in cardiology",
-    "Why did our A&E costs go up last month?",
-    "Compare our stroke costs to other similar trusts",
-    "Find emergency admissions over 65 with length of stay more than 7 days"
-  ];
+        const MessageSquare = () => (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+        );
 
-  const roleBasedSuggestions = {
-    clinical: [
-      "Are we spending too much on cardiology procedures?",
-      "Show cost-effective treatment pathways for diabetes patients",
-      "Which consultants have the most efficient outcomes?"
-    ],
-    finance: [
-      "Generate monthly budget variance report",
-      "Show departments exceeding budget by more than 10%",
-      "What are our top 5 cost improvement opportunities?"
-    ],
-    management: [
-      "Create board report on operational efficiency",
-      "Show me resource utilization across all departments",
-      "Compare our performance to regional benchmarks"
-    ]
-  };
+        const BarChart3 = () => (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M3 3v18h18"></path>
+                <path d="M18 17V9"></path>
+                <path d="M13 17V5"></path>
+                <path d="M8 17v-3"></path>
+            </svg>
+        );
 
-  useEffect(() => {
-    setInsights(sampleInsights);
-  }, []);
+        const Users = () => (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        );
 
-  const handleQuerySubmit = (queryText = query) => {
-    if (!queryText.trim()) return;
+        const TrendingUp = () => (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline>
+                <polyline points="16,7 22,7 22,13"></polyline>
+            </svg>
+        );
 
-    const newMessage = {
-      id: Date.now(),
-      type: 'user',
-      content: queryText,
-      timestamp: new Date().toLocaleTimeString()
-    };
+        const AlertCircle = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        );
 
-    // Simulate AI response based on query
-    let aiResponse = generateAIResponse(queryText);
-    
-    const aiMessage = {
-      id: Date.now() + 1,
-      type: 'ai',
-      content: aiResponse,
-      timestamp: new Date().toLocaleTimeString(),
-      hasChart: aiResponse.includes('chart') || aiResponse.includes('graph'),
-      hasTable: aiResponse.includes('table') || aiResponse.includes('breakdown')
-    };
+        const Mic = () => (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+        );
 
-    setMessages(prev => [...prev, newMessage, aiMessage]);
-    setQuery('');
-  };
+        const MicOff = () => (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <line x1="2" y1="2" x2="22" y2="22"></line>
+                <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"></path>
+                <path d="M12 19a7 7 0 0 1-7-7v-2"></path>
+                <path d="M12 8v4"></path>
+                <path d="M12 2a3 3 0 0 1 3 3v3"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+        );
 
-  const generateAIResponse = (query) => {
-    const lowerQuery = query.toLowerCase();
-    
-    if (lowerQuery.includes('hip replacement') || lowerQuery.includes('orthopaedic')) {
-      return `I found that hip replacement costs this quarter averaged £8,450 per case. Here's the breakdown:
+        const PLICSAIDemo = () => {
+            const [activeTab, setActiveTab] = useState('query');
+            const [query, setQuery] = useState('');
+            const [messages, setMessages] = useState([]);
+            const [isListening, setIsListening] = useState(false);
+            const [insights, setInsights] = useState([]);
+
+            // Sample data for demonstrations
+            const sampleInsights = [
+                {
+                    id: 1,
+                    type: 'alert',
+                    title: 'Theatre Costs Alert',
+                    message: 'Orthopaedic theatre costs increased 15% this month - mainly due to longer procedure times and increased implant costs.',
+                    action: 'View Details',
+                    priority: 'high'
+                },
+                {
+                    id: 2,
+                    type: 'opportunity',
+                    title: 'Cost Improvement Opportunity',
+                    message: 'A&E cost per attendance is 8% below national average - potential to share best practices with other departments.',
+                    action: 'Generate Report',
+                    priority: 'medium'
+                },
+                {
+                    id: 3,
+                    type: 'trend',
+                    title: 'Positive Trend Detected',
+                    message: 'Day case conversion rate improved by 12% in general surgery, reducing average length of stay costs.',
+                    action: 'View Analysis',
+                    priority: 'low'
+                }
+            ];
+
+            const querySuggestions = [
+                "What's the average cost of hip replacements this quarter?",
+                "Show me all patients who cost more than £15,000 in cardiology",
+                "Why did our A&E costs go up last month?",
+                "Compare our stroke costs to other similar trusts",
+                "Find emergency admissions over 65 with length of stay more than 7 days"
+            ];
+
+            const roleBasedSuggestions = {
+                clinical: [
+                    "Are we spending too much on cardiology procedures?",
+                    "Show cost-effective treatment pathways for diabetes patients",
+                    "Which consultants have the most efficient outcomes?"
+                ],
+                finance: [
+                    "Generate monthly budget variance report",
+                    "Show departments exceeding budget by more than 10%",
+                    "What are our top 5 cost improvement opportunities?"
+                ],
+                management: [
+                    "Create board report on operational efficiency",
+                    "Show me resource utilization across all departments",
+                    "Compare our performance to regional benchmarks"
+                ]
+            };
+
+            useEffect(() => {
+                setInsights(sampleInsights);
+            }, []);
+
+            const handleQuerySubmit = (queryText = query) => {
+                if (!queryText.trim()) return;
+
+                const newMessage = {
+                    id: Date.now(),
+                    type: 'user',
+                    content: queryText,
+                    timestamp: new Date().toLocaleTimeString()
+                };
+
+                // Simulate AI response based on query
+                let aiResponse = generateAIResponse(queryText);
+                
+                const aiMessage = {
+                    id: Date.now() + 1,
+                    type: 'ai',
+                    content: aiResponse,
+                    timestamp: new Date().toLocaleTimeString(),
+                    hasChart: aiResponse.includes('chart') || aiResponse.includes('graph'),
+                    hasTable: aiResponse.includes('table') || aiResponse.includes('breakdown')
+                };
+
+                setMessages(prev => [...prev, newMessage, aiMessage]);
+                setQuery('');
+            };
+
+            const generateAIResponse = (query) => {
+                const lowerQuery = query.toLowerCase();
+                
+                if (lowerQuery.includes('hip replacement') || lowerQuery.includes('orthopaedic')) {
+                    return `I found that hip replacement costs this quarter averaged £8,450 per case. Here's the breakdown:
 
 • **Average total cost**: £8,450 (↑12% vs last quarter)
 • **Theatre time**: 2.1 hours average
@@ -105,10 +200,10 @@ const PLICSAIDemo = () => {
 • **Length of stay**: 3.2 days average
 
 **Key insight**: The increase is mainly due to more complex revision cases (18% of total). Would you like me to show the cost comparison with other trusts or analyze the revision case details?`;
-    }
-    
-    if (lowerQuery.includes('cardiology') && lowerQuery.includes('15000')) {
-      return `I found 23 cardiology patients who exceeded £15,000 costs this month:
+                }
+                
+                if (lowerQuery.includes('cardiology') && lowerQuery.includes('15000')) {
+                    return `I found 23 cardiology patients who exceeded £15,000 costs this month:
 
 • **Highest cost**: £34,250 (complex cardiac surgery with complications)
 • **Average cost**: £19,800
@@ -120,10 +215,10 @@ const PLICSAIDemo = () => {
 - Emergency procedures: 3 patients (avg £16,200)
 
 Would you like me to create a detailed case review report or compare these to national benchmarks?`;
-    }
-    
-    if (lowerQuery.includes('a&e') || lowerQuery.includes('emergency')) {
-      return `A&E costs increased by £47,000 (8.5%) last month. Here's what drove the increase:
+                }
+                
+                if (lowerQuery.includes('a&e') || lowerQuery.includes('emergency')) {
+                    return `A&E costs increased by £47,000 (8.5%) last month. Here's what drove the increase:
 
 **Main cost drivers**:
 • **Increased attendances**: +12% (2,340 vs 2,089 previous month)
@@ -132,10 +227,10 @@ Would you like me to create a detailed case review report or compare these to na
 • **Admissions rate**: 23% (up from 19%)
 
 **Recommendations**: Consider reviewing triage protocols and explore community care alternatives for non-urgent cases. Would you like me to generate a detailed action plan?`;
-    }
-    
-    if (lowerQuery.includes('stroke') || lowerQuery.includes('benchmark')) {
-      return `Stroke pathway costs compared to similar trusts:
+                }
+                
+                if (lowerQuery.includes('stroke') || lowerQuery.includes('benchmark')) {
+                    return `Stroke pathway costs compared to similar trusts:
 
 **Your performance**:
 • Average cost per stroke: £12,400
@@ -148,9 +243,9 @@ Would you like me to create a detailed case review report or compare these to na
 • **Area for improvement**: Readmission rate 2% above benchmark
 
 Your stroke unit is performing well overall. The main opportunity is reducing readmissions through enhanced discharge planning.`;
-    }
-    
-    return `I understand you're looking for information about "${query}". Based on your PLICS data, I can help you analyze costs, identify trends, and compare performance. 
+                }
+                
+                return `I understand you're looking for information about "${query}". Based on your PLICS data, I can help you analyze costs, identify trends, and compare performance. 
 
 What specific aspect would you like me to focus on?
 • Cost breakdowns and trends
@@ -160,314 +255,317 @@ What specific aspect would you like me to focus on?
 • Resource utilization
 
 Just let me know what you'd like to explore further!`;
-  };
+            };
 
-  const toggleVoiceInput = () => {
-    setIsListening(!isListening);
-    // In a real implementation, this would use Web Speech API
-    if (!isListening) {
-      setTimeout(() => {
-        setQuery("Show me emergency admissions over 65 with length of stay more than 7 days");
-        setIsListening(false);
-      }, 2000);
-    }
-  };
+            const toggleVoiceInput = () => {
+                setIsListening(!isListening);
+                // In a real implementation, this would use Web Speech API
+                if (!isListening) {
+                    setTimeout(() => {
+                        setQuery("Show me emergency admissions over 65 with length of stay more than 7 days");
+                        setIsListening(false);
+                    }, 2000);
+                }
+            };
 
-  return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="bg-blue-600 text-white p-6">
-          <h1 className="text-2xl font-bold mb-2">AI-Enhanced PLICS Engine</h1>
-          <p className="text-blue-100">Ask questions in plain English • Get instant insights • Explore data naturally</p>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="border-b border-gray-200">
-          <nav className="flex space-x-8 px-6">
-            <button
-              onClick={() => setActiveTab('query')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm ${
-                activeTab === 'query'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <MessageSquare className="inline-block w-4 h-4 mr-2" />
-              Natural Language Query
-            </button>
-            <button
-              onClick={() => setActiveTab('insights')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm ${
-                activeTab === 'insights'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <TrendingUp className="inline-block w-4 h-4 mr-2" />
-              Smart Insights
-            </button>
-            <button
-              onClick={() => setActiveTab('suggestions')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm ${
-                activeTab === 'suggestions'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Users className="inline-block w-4 h-4 mr-2" />
-              Role-Based Helpers
-            </button>
-          </nav>
-        </div>
-
-        {/* Content Area */}
-        <div className="p-6">
-          {activeTab === 'query' && (
-            <div className="space-y-6">
-              {/* Query Input */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Ask your PLICS question in plain English:
-                </label>
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="e.g., What's the average cost of hip replacements this quarter?"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    onKeyPress={(e) => e.key === 'Enter' && handleQuerySubmit()}
-                  />
-                  <button
-                    onClick={toggleVoiceInput}
-                    className={`px-4 py-2 rounded-lg border ${
-                      isListening
-                        ? 'bg-red-500 text-white border-red-500'
-                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  </button>
-                  <button
-                    onClick={() => handleQuerySubmit()}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    <Search className="w-4 h-4 inline mr-2" />
-                    Ask
-                  </button>
-                </div>
-                {isListening && (
-                  <p className="text-sm text-red-600 mt-2">🎤 Listening... (Demo: auto-filling sample query)</p>
-                )}
-              </div>
-
-              {/* Quick Suggestions */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Try these example questions:</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {querySuggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleQuerySubmit(suggestion)}
-                      className="text-left p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 text-sm"
-                    >
-                      "{suggestion}"
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Chat Messages */}
-              <div className="space-y-4 max-h-96 overflow-y-auto">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-3xl px-4 py-3 rounded-lg ${
-                        message.type === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      <div className="whitespace-pre-wrap">{message.content}</div>
-                      {message.hasChart && (
-                        <div className="mt-3 p-3 bg-white rounded border">
-                          <div className="h-32 bg-gradient-to-r from-blue-100 to-blue-200 rounded flex items-center justify-center text-blue-600">
-                            <BarChart3 className="w-8 h-8 mr-2" />
-                            Interactive Chart Would Appear Here
-                          </div>
+            return (
+                <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
+                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                        {/* Header */}
+                        <div className="bg-blue-600 text-white p-6">
+                            <h1 className="text-2xl font-bold mb-2">AI-Enhanced PLICS Engine</h1>
+                            <p className="text-blue-100">Ask questions in plain English • Get instant insights • Explore data naturally</p>
                         </div>
-                      )}
-                      <div className="text-xs opacity-75 mt-2">{message.timestamp}</div>
+
+                        {/* Navigation Tabs */}
+                        <div className="border-b border-gray-200">
+                            <nav className="flex space-x-8 px-6">
+                                <button
+                                    onClick={() => setActiveTab('query')}
+                                    className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
+                                        activeTab === 'query'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                                    }`}
+                                >
+                                    <MessageSquare />
+                                    <span className="ml-2">Natural Language Query</span>
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('insights')}
+                                    className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
+                                        activeTab === 'insights'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                                    }`}
+                                >
+                                    <TrendingUp />
+                                    <span className="ml-2">Smart Insights</span>
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('suggestions')}
+                                    className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
+                                        activeTab === 'suggestions'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                                    }`}
+                                >
+                                    <Users />
+                                    <span className="ml-2">Role-Based Helpers</span>
+                                </button>
+                            </nav>
+                        </div>
+
+                        {/* Content Area */}
+                        <div className="p-6">
+                            {activeTab === 'query' && (
+                                <div className="space-y-6">
+                                    {/* Query Input */}
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Ask your PLICS question in plain English:
+                                        </label>
+                                        <div className="flex space-x-2">
+                                            <input
+                                                type="text"
+                                                value={query}
+                                                onChange={(e) => setQuery(e.target.value)}
+                                                placeholder="e.g., What's the average cost of hip replacements this quarter?"
+                                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                onKeyPress={(e) => e.key === 'Enter' && handleQuerySubmit()}
+                                            />
+                                            <button
+                                                onClick={toggleVoiceInput}
+                                                className={`px-4 py-2 rounded-lg border flex items-center justify-center ${
+                                                    isListening
+                                                        ? 'bg-red-500 text-white border-red-500 listening-pulse'
+                                                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                {isListening ? <MicOff /> : <Mic />}
+                                            </button>
+                                            <button
+                                                onClick={() => handleQuerySubmit()}
+                                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
+                                            >
+                                                <Search />
+                                                <span className="ml-2">Ask</span>
+                                            </button>
+                                        </div>
+                                        {isListening && (
+                                            <p className="text-sm text-red-600 mt-2">🎤 Listening... (Demo: auto-filling sample query)</p>
+                                        )}
+                                    </div>
+
+                                    {/* Quick Suggestions */}
+                                    <div>
+                                        <h3 className="text-sm font-medium text-gray-700 mb-3">Try these example questions:</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            {querySuggestions.map((suggestion, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => handleQuerySubmit(suggestion)}
+                                                    className="text-left p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 text-sm"
+                                                >
+                                                    "{suggestion}"
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chat Messages */}
+                                    <div className="space-y-4 chat-container">
+                                        {messages.map((message) => (
+                                            <div
+                                                key={message.id}
+                                                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                                            >
+                                                <div
+                                                    className={`max-w-3xl px-4 py-3 rounded-lg ${
+                                                        message.type === 'user'
+                                                            ? 'bg-blue-600 text-white'
+                                                            : 'bg-gray-100 text-gray-800'
+                                                    }`}
+                                                >
+                                                    <div className="whitespace-pre-wrap">{message.content}</div>
+                                                    {message.hasChart && (
+                                                        <div className="mt-3 p-3 bg-white rounded border">
+                                                            <div className="h-32 bg-gradient-to-r from-blue-100 to-blue-200 rounded flex items-center justify-center text-blue-600">
+                                                                <BarChart3 />
+                                                                <span className="ml-2">Interactive Chart Would Appear Here</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    <div className="text-xs opacity-75 mt-2">{message.timestamp}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'insights' && (
+                                <div className="space-y-6">
+                                    <div className="bg-blue-50 p-4 rounded-lg">
+                                        <h3 className="font-medium text-blue-900 mb-2">Proactive AI Insights</h3>
+                                        <p className="text-blue-700 text-sm">
+                                            The AI continuously monitors your PLICS data and automatically surfaces important patterns, anomalies, and opportunities.
+                                        </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {insights.map((insight) => (
+                                            <div
+                                                key={insight.id}
+                                                className={`p-4 rounded-lg border-l-4 ${
+                                                    insight.priority === 'high'
+                                                        ? 'border-red-500 bg-red-50'
+                                                        : insight.priority === 'medium'
+                                                        ? 'border-yellow-500 bg-yellow-50'
+                                                        : 'border-green-500 bg-green-50'
+                                                }`}
+                                            >
+                                                <div className="flex items-start space-x-3">
+                                                    <div className={`mt-1 ${
+                                                        insight.priority === 'high'
+                                                            ? 'text-red-500'
+                                                            : insight.priority === 'medium'
+                                                            ? 'text-yellow-500'
+                                                            : 'text-green-500'
+                                                    }`}>
+                                                        <AlertCircle />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h4 className="font-medium text-gray-900">{insight.title}</h4>
+                                                        <p className="text-sm text-gray-600 mt-1">{insight.message}</p>
+                                                        <button className="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                                            {insight.action} →
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h4 className="font-medium text-gray-900 mb-2">How This Works:</h4>
+                                        <ul className="text-sm text-gray-600 space-y-1">
+                                            <li>• AI analyzes your data patterns continuously</li>
+                                            <li>• Compares current performance to historical trends and benchmarks</li>
+                                            <li>• Identifies outliers, opportunities, and areas needing attention</li>
+                                            <li>• Provides context and suggested actions for each insight</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'suggestions' && (
+                                <div className="space-y-6">
+                                    <div className="bg-green-50 p-4 rounded-lg">
+                                        <h3 className="font-medium text-green-900 mb-2">Role-Based AI Assistants</h3>
+                                        <p className="text-green-700 text-sm">
+                                            Different AI helpers understand the specific needs and language of different roles in your organization.
+                                        </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="bg-white p-4 rounded-lg border">
+                                            <div className="flex items-center space-x-2 mb-3">
+                                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                    <Users />
+                                                </div>
+                                                <h4 className="font-medium text-gray-900">Clinical Directors</h4>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {roleBasedSuggestions.clinical.map((suggestion, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => {
+                                                            setActiveTab('query');
+                                                            setTimeout(() => handleQuerySubmit(suggestion), 100);
+                                                        }}
+                                                        className="w-full text-left p-2 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
+                                                    >
+                                                        "{suggestion}"
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white p-4 rounded-lg border">
+                                            <div className="flex items-center space-x-2 mb-3">
+                                                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                                    <TrendingUp />
+                                                </div>
+                                                <h4 className="font-medium text-gray-900">Finance Managers</h4>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {roleBasedSuggestions.finance.map((suggestion, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => {
+                                                            setActiveTab('query');
+                                                            setTimeout(() => handleQuerySubmit(suggestion), 100);
+                                                        }}
+                                                        className="w-full text-left p-2 text-sm bg-green-50 text-green-700 rounded hover:bg-green-100"
+                                                    >
+                                                        "{suggestion}"
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white p-4 rounded-lg border">
+                                            <div className="flex items-center space-x-2 mb-3">
+                                                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                                    <BarChart3 />
+                                                </div>
+                                                <h4 className="font-medium text-gray-900">Senior Management</h4>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {roleBasedSuggestions.management.map((suggestion, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => {
+                                                            setActiveTab('query');
+                                                            setTimeout(() => handleQuerySubmit(suggestion), 100);
+                                                        }}
+                                                        className="w-full text-left p-2 text-sm bg-purple-50 text-purple-700 rounded hover:bg-purple-100"
+                                                    >
+                                                        "{suggestion}"
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h4 className="font-medium text-gray-900 mb-2">Benefits of Role-Based AI:</h4>
+                                        <ul className="text-sm text-gray-600 space-y-1">
+                                            <li>• <strong>Contextual Understanding</strong>: Each AI assistant understands the specific terminology and priorities of different roles</li>
+                                            <li>• <strong>Relevant Suggestions</strong>: Questions and insights are tailored to what each role typically needs</li>
+                                            <li>• <strong>Appropriate Detail Level</strong>: Clinical staff get clinical context, finance gets financial metrics, management gets strategic overview</li>
+                                            <li>• <strong>Workflow Integration</strong>: Responses are formatted to fit into existing decision-making processes</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
-          {activeTab === 'insights' && (
-            <div className="space-y-6">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-medium text-blue-900 mb-2">Proactive AI Insights</h3>
-                <p className="text-blue-700 text-sm">
-                  The AI continuously monitors your PLICS data and automatically surfaces important patterns, anomalies, and opportunities.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {insights.map((insight) => (
-                  <div
-                    key={insight.id}
-                    className={`p-4 rounded-lg border-l-4 ${
-                      insight.priority === 'high'
-                        ? 'border-red-500 bg-red-50'
-                        : insight.priority === 'medium'
-                        ? 'border-yellow-500 bg-yellow-50'
-                        : 'border-green-500 bg-green-50'
-                    }`}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <AlertCircle
-                        className={`w-5 h-5 mt-1 ${
-                          insight.priority === 'high'
-                            ? 'text-red-500'
-                            : insight.priority === 'medium'
-                            ? 'text-yellow-500'
-                            : 'text-green-500'
-                        }`}
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{insight.title}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{insight.message}</p>
-                        <button className="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium">
-                          {insight.action} →
-                        </button>
-                      </div>
+                    {/* Demo Note */}
+                    <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p className="text-sm text-yellow-800">
+                            <strong>Demo Note:</strong> This is a functional prototype showing AI-enhanced PLICS interactions. 
+                            In a real implementation, these would connect to your actual PLICS database and use advanced AI models 
+                            for natural language processing and data analysis.
+                        </p>
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-2">How This Works:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• AI analyzes your data patterns continuously</li>
-                  <li>• Compares current performance to historical trends and benchmarks</li>
-                  <li>• Identifies outliers, opportunities, and areas needing attention</li>
-                  <li>• Provides context and suggested actions for each insight</li>
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'suggestions' && (
-            <div className="space-y-6">
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="font-medium text-green-900 mb-2">Role-Based AI Assistants</h3>
-                <p className="text-green-700 text-sm">
-                  Different AI helpers understand the specific needs and language of different roles in your organization.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-4 rounded-lg border">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Users className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <h4 className="font-medium text-gray-900">Clinical Directors</h4>
-                  </div>
-                  <div className="space-y-2">
-                    {roleBasedSuggestions.clinical.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          setActiveTab('query');
-                          setTimeout(() => handleQuerySubmit(suggestion), 100);
-                        }}
-                        className="w-full text-left p-2 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
-                      >
-                        "{suggestion}"
-                      </button>
-                    ))}
-                  </div>
                 </div>
+            );
+        };
 
-                <div className="bg-white p-4 rounded-lg border">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-4 h-4 text-green-600" />
-                    </div>
-                    <h4 className="font-medium text-gray-900">Finance Managers</h4>
-                  </div>
-                  <div className="space-y-2">
-                    {roleBasedSuggestions.finance.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          setActiveTab('query');
-                          setTimeout(() => handleQuerySubmit(suggestion), 100);
-                        }}
-                        className="w-full text-left p-2 text-sm bg-green-50 text-green-700 rounded hover:bg-green-100"
-                      >
-                        "{suggestion}"
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-white p-4 rounded-lg border">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <h4 className="font-medium text-gray-900">Senior Management</h4>
-                  </div>
-                  <div className="space-y-2">
-                    {roleBasedSuggestions.management.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          setActiveTab('query');
-                          setTimeout(() => handleQuerySubmit(suggestion), 100);
-                        }}
-                        className="w-full text-left p-2 text-sm bg-purple-50 text-purple-700 rounded hover:bg-purple-100"
-                      >
-                        "{suggestion}"
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-2">Benefits of Role-Based AI:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• **Contextual Understanding**: Each AI assistant understands the specific terminology and priorities of different roles</li>
-                  <li>• **Relevant Suggestions**: Questions and insights are tailored to what each role typically needs</li>
-                  <li>• **Appropriate Detail Level**: Clinical staff get clinical context, finance gets financial metrics, management gets strategic overview</li>
-                  <li>• **Workflow Integration**: Responses are formatted to fit into existing decision-making processes</li>
-                </ul>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Demo Note */}
-      <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-sm text-yellow-800">
-          <strong>Demo Note:</strong> This is a functional prototype showing AI-enhanced PLICS interactions. 
-          In a real implementation, these would connect to your actual PLICS database and use advanced AI models 
-          for natural language processing and data analysis.
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export default PLICSAIDemo;
+        ReactDOM.render(<PLICSAIDemo />, document.getElementById('root'));
+    </script>
+</body>
+</html>
