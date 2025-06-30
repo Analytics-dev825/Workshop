@@ -8,11 +8,16 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        }
+        .icon {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            text-align: center;
+            font-size: 0.875rem;
         }
     </style>
 </head>
@@ -21,23 +26,31 @@
 
     <script type="text/babel">
         const { useState, useEffect } = React;
-        
-        // Create icon components from Lucide
-        const Search = (props) => React.createElement(lucide.Search, props);
-        const MessageSquare = (props) => React.createElement(lucide.MessageSquare, props);
-        const BarChart3 = (props) => React.createElement(lucide.BarChart3, props);
-        const Users = (props) => React.createElement(lucide.Users, props);
-        const TrendingUp = (props) => React.createElement(lucide.TrendingUp, props);
-        const AlertCircle = (props) => React.createElement(lucide.AlertCircle, props);
-        const Mic = (props) => React.createElement(lucide.Mic, props);
-        const MicOff = (props) => React.createElement(lucide.MicOff, props);
+
+        // Simple icon components using Unicode symbols
+        const Icon = ({ type, className = "" }) => {
+            const icons = {
+                search: "🔍",
+                message: "💬",
+                chart: "📊",
+                users: "👥",
+                trend: "📈",
+                alert: "⚠️",
+                mic: "🎤",
+                micOff: "🔇"
+            };
+            
+            return React.createElement('span', { 
+                className: `icon ${className}`,
+                style: { fontSize: '1rem' }
+            }, icons[type] || "•");
+        };
 
         const PLICSAIDemo = () => {
             const [activeTab, setActiveTab] = useState('query');
             const [query, setQuery] = useState('');
             const [messages, setMessages] = useState([]);
             const [isListening, setIsListening] = useState(false);
-            const [suggestions, setSuggestions] = useState([]);
             const [insights, setInsights] = useState([]);
 
             // Sample data for demonstrations
@@ -236,304 +249,291 @@ Just let me know what you'd like to explore further!`;
                 }
             };
 
-            return (
-                <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                        {/* Header */}
-                        <div className="bg-blue-600 text-white p-6">
-                            <h1 className="text-2xl font-bold mb-2">AI-Enhanced PLICS Engine</h1>
-                            <p className="text-blue-100">Ask questions in plain English • Get instant insights • Explore data naturally</p>
-                        </div>
+            return React.createElement('div', { className: "max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen" },
+                React.createElement('div', { className: "bg-white rounded-lg shadow-lg overflow-hidden" },
+                    // Header
+                    React.createElement('div', { className: "bg-blue-600 text-white p-6" },
+                        React.createElement('h1', { className: "text-2xl font-bold mb-2" }, "AI-Enhanced PLICS Engine"),
+                        React.createElement('p', { className: "text-blue-100" }, "Ask questions in plain English • Get instant insights • Explore data naturally")
+                    ),
 
-                        {/* Navigation Tabs */}
-                        <div className="border-b border-gray-200">
-                            <nav className="flex space-x-8 px-6">
-                                <button
-                                    onClick={() => setActiveTab('query')}
-                                    className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
-                                        activeTab === 'query'
-                                            ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                                    }`}
-                                >
-                                    <MessageSquare className="w-4 h-4 mr-2" />
-                                    Natural Language Query
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('insights')}
-                                    className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
-                                        activeTab === 'insights'
-                                            ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                                    }`}
-                                >
-                                    <TrendingUp className="w-4 h-4 mr-2" />
-                                    Smart Insights
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('suggestions')}
-                                    className={`py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
-                                        activeTab === 'suggestions'
-                                            ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                                    }`}
-                                >
-                                    <Users className="w-4 h-4 mr-2" />
-                                    Role-Based Helpers
-                                </button>
-                            </nav>
-                        </div>
+                    // Navigation Tabs
+                    React.createElement('div', { className: "border-b border-gray-200" },
+                        React.createElement('nav', { className: "flex space-x-8 px-6" },
+                            React.createElement('button', {
+                                onClick: () => setActiveTab('query'),
+                                className: `py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
+                                    activeTab === 'query'
+                                        ? 'border-blue-500 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`
+                            },
+                                React.createElement(Icon, { type: "message", className: "mr-2" }),
+                                "Natural Language Query"
+                            ),
+                            React.createElement('button', {
+                                onClick: () => setActiveTab('insights'),
+                                className: `py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
+                                    activeTab === 'insights'
+                                        ? 'border-blue-500 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`
+                            },
+                                React.createElement(Icon, { type: "trend", className: "mr-2" }),
+                                "Smart Insights"
+                            ),
+                            React.createElement('button', {
+                                onClick: () => setActiveTab('suggestions'),
+                                className: `py-4 px-2 border-b-2 font-medium text-sm flex items-center ${
+                                    activeTab === 'suggestions'
+                                        ? 'border-blue-500 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`
+                            },
+                                React.createElement(Icon, { type: "users", className: "mr-2" }),
+                                "Role-Based Helpers"
+                            )
+                        )
+                    ),
 
-                        {/* Content Area */}
-                        <div className="p-6">
-                            {activeTab === 'query' && (
-                                <div className="space-y-6">
-                                    {/* Query Input */}
-                                    <div className="bg-gray-50 p-4 rounded-lg">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Ask your PLICS question in plain English:
-                                        </label>
-                                        <div className="flex space-x-2">
-                                            <input
-                                                type="text"
-                                                value={query}
-                                                onChange={(e) => setQuery(e.target.value)}
-                                                placeholder="e.g., What's the average cost of hip replacements this quarter?"
-                                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                onKeyPress={(e) => e.key === 'Enter' && handleQuerySubmit()}
-                                            />
-                                            <button
-                                                onClick={toggleVoiceInput}
-                                                className={`px-4 py-2 rounded-lg border flex items-center ${
-                                                    isListening
-                                                        ? 'bg-red-500 text-white border-red-500'
-                                                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                                                }`}
-                                            >
-                                                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                                            </button>
-                                            <button
-                                                onClick={() => handleQuerySubmit()}
-                                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
-                                            >
-                                                <Search className="w-4 h-4 mr-2" />
-                                                Ask
-                                            </button>
-                                        </div>
-                                        {isListening && (
-                                            <p className="text-sm text-red-600 mt-2">🎤 Listening... (Demo: auto-filling sample query)</p>
-                                        )}
-                                    </div>
+                    // Content Area
+                    React.createElement('div', { className: "p-6" },
+                        // Query Tab
+                        activeTab === 'query' && React.createElement('div', { className: "space-y-6" },
+                            // Query Input
+                            React.createElement('div', { className: "bg-gray-50 p-4 rounded-lg" },
+                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-2" },
+                                    "Ask your PLICS question in plain English:"
+                                ),
+                                React.createElement('div', { className: "flex space-x-2" },
+                                    React.createElement('input', {
+                                        type: "text",
+                                        value: query,
+                                        onChange: (e) => setQuery(e.target.value),
+                                        placeholder: "e.g., What's the average cost of hip replacements this quarter?",
+                                        className: "flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                                        onKeyPress: (e) => e.key === 'Enter' && handleQuerySubmit()
+                                    }),
+                                    React.createElement('button', {
+                                        onClick: toggleVoiceInput,
+                                        className: `px-4 py-2 rounded-lg border flex items-center ${
+                                            isListening
+                                                ? 'bg-red-500 text-white border-red-500'
+                                                : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                        }`
+                                    },
+                                        React.createElement(Icon, { type: isListening ? "micOff" : "mic" })
+                                    ),
+                                    React.createElement('button', {
+                                        onClick: () => handleQuerySubmit(),
+                                        className: "px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
+                                    },
+                                        React.createElement(Icon, { type: "search", className: "mr-2" }),
+                                        "Ask"
+                                    )
+                                ),
+                                isListening && React.createElement('p', { className: "text-sm text-red-600 mt-2" },
+                                    "🎤 Listening... (Demo: auto-filling sample query)"
+                                )
+                            ),
 
-                                    {/* Quick Suggestions */}
-                                    <div>
-                                        <h3 className="text-sm font-medium text-gray-700 mb-3">Try these example questions:</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                            {querySuggestions.map((suggestion, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => handleQuerySubmit(suggestion)}
-                                                    className="text-left p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 text-sm"
-                                                >
-                                                    "{suggestion}"
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                            // Quick Suggestions
+                            React.createElement('div', {},
+                                React.createElement('h3', { className: "text-sm font-medium text-gray-700 mb-3" },
+                                    "Try these example questions:"
+                                ),
+                                React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-2" },
+                                    querySuggestions.map((suggestion, index) =>
+                                        React.createElement('button', {
+                                            key: index,
+                                            onClick: () => handleQuerySubmit(suggestion),
+                                            className: "text-left p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 text-sm"
+                                        }, `"${suggestion}"`)
+                                    )
+                                )
+                            ),
 
-                                    {/* Chat Messages */}
-                                    <div className="space-y-4 max-h-96 overflow-y-auto">
-                                        {messages.map((message) => (
-                                            <div
-                                                key={message.id}
-                                                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                                            >
-                                                <div
-                                                    className={`max-w-3xl px-4 py-3 rounded-lg ${
-                                                        message.type === 'user'
-                                                            ? 'bg-blue-600 text-white'
-                                                            : 'bg-gray-100 text-gray-800'
-                                                    }`}
-                                                >
-                                                    <div className="whitespace-pre-wrap">{message.content}</div>
-                                                    {message.hasChart && (
-                                                        <div className="mt-3 p-3 bg-white rounded border">
-                                                            <div className="h-32 bg-gradient-to-r from-blue-100 to-blue-200 rounded flex items-center justify-center text-blue-600">
-                                                                <BarChart3 className="w-8 h-8 mr-2" />
-                                                                Interactive Chart Would Appear Here
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    <div className="text-xs opacity-75 mt-2">{message.timestamp}</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                            // Chat Messages
+                            React.createElement('div', { className: "space-y-4 max-h-96 overflow-y-auto" },
+                                messages.map((message) =>
+                                    React.createElement('div', {
+                                        key: message.id,
+                                        className: `flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`
+                                    },
+                                        React.createElement('div', {
+                                            className: `max-w-3xl px-4 py-3 rounded-lg ${
+                                                message.type === 'user'
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'bg-gray-100 text-gray-800'
+                                            }`
+                                        },
+                                            React.createElement('div', { className: "whitespace-pre-wrap" }, message.content),
+                                            message.hasChart && React.createElement('div', { className: "mt-3 p-3 bg-white rounded border" },
+                                                React.createElement('div', { className: "h-32 bg-gradient-to-r from-blue-100 to-blue-200 rounded flex items-center justify-center text-blue-600" },
+                                                    React.createElement(Icon, { type: "chart", className: "mr-2" }),
+                                                    "Interactive Chart Would Appear Here"
+                                                )
+                                            ),
+                                            React.createElement('div', { className: "text-xs opacity-75 mt-2" }, message.timestamp)
+                                        )
+                                    )
+                                )
+                            )
+                        ),
 
-                            {activeTab === 'insights' && (
-                                <div className="space-y-6">
-                                    <div className="bg-blue-50 p-4 rounded-lg">
-                                        <h3 className="font-medium text-blue-900 mb-2">Proactive AI Insights</h3>
-                                        <p className="text-blue-700 text-sm">
-                                            The AI continuously monitors your PLICS data and automatically surfaces important patterns, anomalies, and opportunities.
-                                        </p>
-                                    </div>
+                        // Insights Tab
+                        activeTab === 'insights' && React.createElement('div', { className: "space-y-6" },
+                            React.createElement('div', { className: "bg-blue-50 p-4 rounded-lg" },
+                                React.createElement('h3', { className: "font-medium text-blue-900 mb-2" }, "Proactive AI Insights"),
+                                React.createElement('p', { className: "text-blue-700 text-sm" },
+                                    "The AI continuously monitors your PLICS data and automatically surfaces important patterns, anomalies, and opportunities."
+                                )
+                            ),
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {insights.map((insight) => (
-                                            <div
-                                                key={insight.id}
-                                                className={`p-4 rounded-lg border-l-4 ${
+                            React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" },
+                                insights.map((insight) =>
+                                    React.createElement('div', {
+                                        key: insight.id,
+                                        className: `p-4 rounded-lg border-l-4 ${
+                                            insight.priority === 'high'
+                                                ? 'border-red-500 bg-red-50'
+                                                : insight.priority === 'medium'
+                                                ? 'border-yellow-500 bg-yellow-50'
+                                                : 'border-green-500 bg-green-50'
+                                        }`
+                                    },
+                                        React.createElement('div', { className: "flex items-start space-x-3" },
+                                            React.createElement(Icon, {
+                                                type: "alert",
+                                                className: `mt-1 ${
                                                     insight.priority === 'high'
-                                                        ? 'border-red-500 bg-red-50'
+                                                        ? 'text-red-500'
                                                         : insight.priority === 'medium'
-                                                        ? 'border-yellow-500 bg-yellow-50'
-                                                        : 'border-green-500 bg-green-50'
-                                                }`}
-                                            >
-                                                <div className="flex items-start space-x-3">
-                                                    <AlertCircle
-                                                        className={`w-5 h-5 mt-1 ${
-                                                            insight.priority === 'high'
-                                                                ? 'text-red-500'
-                                                                : insight.priority === 'medium'
-                                                                ? 'text-yellow-500'
-                                                                : 'text-green-500'
-                                                        }`}
-                                                    />
-                                                    <div className="flex-1">
-                                                        <h4 className="font-medium text-gray-900">{insight.title}</h4>
-                                                        <p className="text-sm text-gray-600 mt-1">{insight.message}</p>
-                                                        <button className="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium">
-                                                            {insight.action} →
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                                        ? 'text-yellow-500'
+                                                        : 'text-green-500'
+                                                }`
+                                            }),
+                                            React.createElement('div', { className: "flex-1" },
+                                                React.createElement('h4', { className: "font-medium text-gray-900" }, insight.title),
+                                                React.createElement('p', { className: "text-sm text-gray-600 mt-1" }, insight.message),
+                                                React.createElement('button', { className: "mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium" },
+                                                    insight.action + " →"
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
 
-                                    <div className="bg-gray-50 p-4 rounded-lg">
-                                        <h4 className="font-medium text-gray-900 mb-2">How This Works:</h4>
-                                        <ul className="text-sm text-gray-600 space-y-1">
-                                            <li>• AI analyzes your data patterns continuously</li>
-                                            <li>• Compares current performance to historical trends and benchmarks</li>
-                                            <li>• Identifies outliers, opportunities, and areas needing attention</li>
-                                            <li>• Provides context and suggested actions for each insight</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
+                            React.createElement('div', { className: "bg-gray-50 p-4 rounded-lg" },
+                                React.createElement('h4', { className: "font-medium text-gray-900 mb-2" }, "How This Works:"),
+                                React.createElement('ul', { className: "text-sm text-gray-600 space-y-1" },
+                                    React.createElement('li', {}, "• AI analyzes your data patterns continuously"),
+                                    React.createElement('li', {}, "• Compares current performance to historical trends and benchmarks"),
+                                    React.createElement('li', {}, "• Identifies outliers, opportunities, and areas needing attention"),
+                                    React.createElement('li', {}, "• Provides context and suggested actions for each insight")
+                                )
+                            )
+                        ),
 
-                            {activeTab === 'suggestions' && (
-                                <div className="space-y-6">
-                                    <div className="bg-green-50 p-4 rounded-lg">
-                                        <h3 className="font-medium text-green-900 mb-2">Role-Based AI Assistants</h3>
-                                        <p className="text-green-700 text-sm">
-                                            Different AI helpers understand the specific needs and language of different roles in your organization.
-                                        </p>
-                                    </div>
+                        // Suggestions Tab
+                        activeTab === 'suggestions' && React.createElement('div', { className: "space-y-6" },
+                            React.createElement('div', { className: "bg-green-50 p-4 rounded-lg" },
+                                React.createElement('h3', { className: "font-medium text-green-900 mb-2" }, "Role-Based AI Assistants"),
+                                React.createElement('p', { className: "text-green-700 text-sm" },
+                                    "Different AI helpers understand the specific needs and language of different roles in your organization."
+                                )
+                            ),
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div className="bg-white p-4 rounded-lg border">
-                                            <div className="flex items-center space-x-2 mb-3">
-                                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                    <Users className="w-4 h-4 text-blue-600" />
-                                                </div>
-                                                <h4 className="font-medium text-gray-900">Clinical Directors</h4>
-                                            </div>
-                                            <div className="space-y-2">
-                                                {roleBasedSuggestions.clinical.map((suggestion, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() => {
-                                                            setActiveTab('query');
-                                                            setTimeout(() => handleQuerySubmit(suggestion), 100);
-                                                        }}
-                                                        className="w-full text-left p-2 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
-                                                    >
-                                                        "{suggestion}"
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
+                            React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-3 gap-6" },
+                                React.createElement('div', { className: "bg-white p-4 rounded-lg border" },
+                                    React.createElement('div', { className: "flex items-center space-x-2 mb-3" },
+                                        React.createElement('div', { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center" },
+                                            React.createElement(Icon, { type: "users", className: "text-blue-600" })
+                                        ),
+                                        React.createElement('h4', { className: "font-medium text-gray-900" }, "Clinical Directors")
+                                    ),
+                                    React.createElement('div', { className: "space-y-2" },
+                                        roleBasedSuggestions.clinical.map((suggestion, index) =>
+                                            React.createElement('button', {
+                                                key: index,
+                                                onClick: () => {
+                                                    setActiveTab('query');
+                                                    setTimeout(() => handleQuerySubmit(suggestion), 100);
+                                                },
+                                                className: "w-full text-left p-2 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
+                                            }, `"${suggestion}"`)
+                                        )
+                                    )
+                                ),
 
-                                        <div className="bg-white p-4 rounded-lg border">
-                                            <div className="flex items-center space-x-2 mb-3">
-                                                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                                    <TrendingUp className="w-4 h-4 text-green-600" />
-                                                </div>
-                                                <h4 className="font-medium text-gray-900">Finance Managers</h4>
-                                            </div>
-                                            <div className="space-y-2">
-                                                {roleBasedSuggestions.finance.map((suggestion, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() => {
-                                                            setActiveTab('query');
-                                                            setTimeout(() => handleQuerySubmit(suggestion), 100);
-                                                        }}
-                                                        className="w-full text-left p-2 text-sm bg-green-50 text-green-700 rounded hover:bg-green-100"
-                                                    >
-                                                        "{suggestion}"
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
+                                React.createElement('div', { className: "bg-white p-4 rounded-lg border" },
+                                    React.createElement('div', { className: "flex items-center space-x-2 mb-3" },
+                                        React.createElement('div', { className: "w-8 h-8 bg-green-100 rounded-full flex items-center justify-center" },
+                                            React.createElement(Icon, { type: "trend", className: "text-green-600" })
+                                        ),
+                                        React.createElement('h4', { className: "font-medium text-gray-900" }, "Finance Managers")
+                                    ),
+                                    React.createElement('div', { className: "space-y-2" },
+                                        roleBasedSuggestions.finance.map((suggestion, index) =>
+                                            React.createElement('button', {
+                                                key: index,
+                                                onClick: () => {
+                                                    setActiveTab('query');
+                                                    setTimeout(() => handleQuerySubmit(suggestion), 100);
+                                                },
+                                                className: "w-full text-left p-2 text-sm bg-green-50 text-green-700 rounded hover:bg-green-100"
+                                            }, `"${suggestion}"`)
+                                        )
+                                    )
+                                ),
 
-                                        <div className="bg-white p-4 rounded-lg border">
-                                            <div className="flex items-center space-x-2 mb-3">
-                                                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                                    <BarChart3 className="w-4 h-4 text-purple-600" />
-                                                </div>
-                                                <h4 className="font-medium text-gray-900">Senior Management</h4>
-                                            </div>
-                                            <div className="space-y-2">
-                                                {roleBasedSuggestions.management.map((suggestion, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() => {
-                                                            setActiveTab('query');
-                                                            setTimeout(() => handleQuerySubmit(suggestion), 100);
-                                                        }}
-                                                        className="w-full text-left p-2 text-sm bg-purple-50 text-purple-700 rounded hover:bg-purple-100"
-                                                    >
-                                                        "{suggestion}"
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
+                                React.createElement('div', { className: "bg-white p-4 rounded-lg border" },
+                                    React.createElement('div', { className: "flex items-center space-x-2 mb-3" },
+                                        React.createElement('div', { className: "w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center" },
+                                            React.createElement(Icon, { type: "chart", className: "text-purple-600" })
+                                        ),
+                                        React.createElement('h4', { className: "font-medium text-gray-900" }, "Senior Management")
+                                    ),
+                                    React.createElement('div', { className: "space-y-2" },
+                                        roleBasedSuggestions.management.map((suggestion, index) =>
+                                            React.createElement('button', {
+                                                key: index,
+                                                onClick: () => {
+                                                    setActiveTab('query');
+                                                    setTimeout(() => handleQuerySubmit(suggestion), 100);
+                                                },
+                                                className: "w-full text-left p-2 text-sm bg-purple-50 text-purple-700 rounded hover:bg-purple-100"
+                                            }, `"${suggestion}"`)
+                                        )
+                                    )
+                                )
+                            ),
 
-                                    <div className="bg-gray-50 p-4 rounded-lg">
-                                        <h4 className="font-medium text-gray-900 mb-2">Benefits of Role-Based AI:</h4>
-                                        <ul className="text-sm text-gray-600 space-y-1">
-                                            <li>• <strong>Contextual Understanding</strong>: Each AI assistant understands the specific terminology and priorities of different roles</li>
-                                            <li>• <strong>Relevant Suggestions</strong>: Questions and insights are tailored to what each role typically needs</li>
-                                            <li>• <strong>Appropriate Detail Level</strong>: Clinical staff get clinical context, finance gets financial metrics, management gets strategic overview</li>
-                                            <li>• <strong>Workflow Integration</strong>: Responses are formatted to fit into existing decision-making processes</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                            React.createElement('div', { className: "bg-gray-50 p-4 rounded-lg" },
+                                React.createElement('h4', { className: "font-medium text-gray-900 mb-2" }, "Benefits of Role-Based AI:"),
+                                React.createElement('ul', { className: "text-sm text-gray-600 space-y-1" },
+                                    React.createElement('li', {}, "• Contextual Understanding: Each AI assistant understands the specific terminology and priorities of different roles"),
+                                    React.createElement('li', {}, "• Relevant Suggestions: Questions and insights are tailored to what each role typically needs"),
+                                    React.createElement('li', {}, "• Appropriate Detail Level: Clinical staff get clinical context, finance gets financial metrics, management gets strategic overview"),
+                                    React.createElement('li', {}, "• Workflow Integration: Responses are formatted to fit into existing decision-making processes")
+                                )
+                            )
+                        )
+                    )
+                ),
 
-                    {/* Demo Note */}
-                    <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <p className="text-sm text-yellow-800">
-                            <strong>Demo Note:</strong> This is a functional prototype showing AI-enhanced PLICS interactions. 
-                            In a real implementation, these would connect to your actual PLICS database and use advanced AI models 
-                            for natural language processing and data analysis.
-                        </p>
-                    </div>
-                </div>
+                // Demo Note
+                React.createElement('div', { className: "mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg" },
+                    React.createElement('p', { className: "text-sm text-yellow-800" },
+                        React.createElement('strong', {}, "Demo Note:"),
+                        " This is a functional prototype showing AI-enhanced PLICS interactions. In a real implementation, these would connect to your actual PLICS database and use advanced AI models for natural language processing and data analysis."
+                    )
+                )
             );
         };
 
-        ReactDOM.render(<PLICSAIDemo />, document.getElementById('root'));
+        ReactDOM.render(React.createElement(PLICSAIDemo), document.getElementById('root'));
     </script>
 </body>
 </html>
